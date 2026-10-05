@@ -1,0 +1,219 @@
+/* =========================================================================
+   1. GLOBAL RENDER VARIABLES & BASE RESETS
+   ========================================================================= */
+:root {
+  --primary-color: #1a365d;    /* Deep institutional blue */
+  --secondary-color: #2b6cb0;  /* Slate blue accent */
+  --background-light: #f7fafc; /* Crisp, clean background gray */
+  --surface-white: #ffffff;    /* pure bright container backgrounds */
+  --text-dark: #2d3748;       /* High-contrast charcoal text */
+  --text-muted: #718096;      /* Subdued gray for descriptive text */
+  --error-red: #e53e3e;        /* Clean alert validation red */
+  --border-radius: 8px;        /* Standardized smooth corner curve */
+  --transition-speed: 0.25s;   /* Snappy interactive animations duration */
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--background-light);
+  color: var(--text-dark);
+  line-height: 1.6;
+  padding: 40px 20px;
+}
+
+/* =========================================================================
+   2. MAIN APPLICATION CONTAINER & STRUCTURAL WRAPPERS
+   ========================================================================= */
+.App-Container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--surface-white);
+  padding: 40px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* =========================================================================
+   3. LOGO HEADER LAYOUT
+   ========================================================================= */
+.Header-Bar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 30px;
+  border-bottom: 2px solid #edf2f7;
+  padding-bottom: 25px;
+}
+
+.App-logo {
+  max-height: 90px;
+  width: auto;
+  object-fit: contain;
+  margin-bottom: 15px;
+}
+
+.HTag {
+  color: var(--primary-color);
+  font-size: 1.85rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+/* =========================================================================
+   4. COLLEGE DISCLOSURE / BANNER SECTION
+   ========================================================================= */
+.App-Container > div:nth-of-type(1) {
+  background-color: #ebf8ff;
+  border-left: 4px solid var(--secondary-color);
+  padding: 15px 20px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  color: #2b6cb0;
+  margin-bottom: 35px;
+}
+
+/* =========================================================================
+   5. UNIFORM BUTTON ELEMENT DESIGNS
+   ========================================================================= */
+button {
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: var(--border-radius);
+  transition: all var(--transition-speed) ease-in-out;
+  border: 1px solid transparent;
+}
+
+/* Primary Action Buttons (Submit / Main Action) */
+button[type="submit"],
+.App-Container button:nth-of-type(1) {
+  background-color: var(--primary-color);
+  color: var(--surface-white);
+}
+
+button[type="submit"]:hover,
+.App-Container button:nth-of-type(1):hover {
+  background-color: var(--secondary-color);
+  transform: translateY(-1px);
+}
+
+/* Secondary Actions / Navigation Buttons */
+button[type="button"],
+.App-Container button:nth-of-type(2),
+.App-Container button:nth-of-type(3) {
+  background-color: #edf2f7;
+  color: var(--text-dark);
+  margin-left: 10px;
+}
+
+button[type="button"]:hover,
+.App-Container button:nth-of-type(2):hover,
+.App-Container button:nth-of-type(3):hover {
+  background-color: #e2e8f0;
+}
+
+/* =========================================================================
+   6. USER REGISTRATION FORM DESIGN
+   ========================================================================= */
+form {
+  background: var(--background-light);
+  padding: 30px;
+  border-radius: var(--border-radius);
+  border: 1px solid #e2e8f0;
+  margin-top: 25px;
+}
+
+form h3 {
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 8px;
+}
+
+form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text-dark);
+  font-size: 0.9rem;
+}
+
+form input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 0.95rem;
+  border: 1px solid #cbd5e0;
+  border-radius: var(--border-radius);
+  background-color: var(--surface-white);
+  margin-bottom: 20px;
+  transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+/* Focus Handshake: Highlights field cleanly on cursor entry */
+form input:focus {
+  outline: none;
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
+/* Remove old breaks since fields are structured block elements */
+form br {
+  display: none;
+}
+
+/* Container spacing context for form action tools */
+form button {
+  margin-top: 10px;
+}
+
+/* =========================================================================
+   7. POSTGRESRETRIEVED DATA DIRECTORY CARDS
+   ========================================================================= */
+/* Container area wrapper */
+.App-Container div[style*="marginTop"] {
+  margin-top: 30px !important;
+}
+
+.App-Container h3 {
+  color: var(--primary-color);
+  font-size: 1.4rem;
+  margin-bottom: 15px;
+}
+
+/* Clean, structured user cards */
+.App-Container div[style*="border"] {
+  background: var(--surface-white) !important;
+  border: 1px solid #e2e8f0 !important;
+  padding: 20px !important;
+  margin: 15px 0 !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02) !important;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+/* Forces specific text styling inside data visualization cards */
+.App-Container div[style*="border"] p {
+  font-size: 0.95rem;
+  color: var(--text-dark);
+}
+
+.App-Container div[style*="border"] p strong {
+  color: var(--text-muted);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  display: block;
+  margin-bottom: 2px;
+}
