@@ -26,7 +26,7 @@ pool.connect((err, client, release) => {
   release();
 });
 
-/ Automatic Table Initialization Query
+// Automatic Table Initialization Query
 const initDatabaseStructure = async () => {
   const createTablesQuery = `
     CREATE TABLE IF NOT EXISTS students(
