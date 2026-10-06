@@ -3,8 +3,12 @@
 // and in Render's dashboard for production) — never hardcode secrets here.
 // Import the Pool class from the 'pg' (node-postgres) library to manage database connections. Using a connection pool is more efficient than opening a new connection for every single query.
 const { Pool } = require('pg');
+const fs = require('fs');
+const path = require('path');
 require('dotenv').config();
 
+// 1. SET UP DATABASE CONNECTION
+// This uses your Render Environment tab values to open the connection securely
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -12,53 +16,40 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT || 5432,
   ssl: {
-    rejectUnauthorized: false // This line forces SSL and fixes the connection error
+    rejectUnauthorized: false // Required for secure cloud platforms like Render
   }
 });
 
-// Here we are connecting the database 
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error('Database connection failed:', err.stack);
-    return;
-  }
-  console.log('Connected to PostgreSQL database.');
-  release();
-});
-
-// Automatic Table Initialization Query
-const initDatabaseStructure = async () => {
-  const createTablesQuery = `
-    CREATE TABLE IF NOT EXISTS students(
-      id SERIAL PRIMARY KEY,
-      name VARCHAR(100) NOT NULL,
-      email VARCHAR(100) NOT NULL UNIQUE,
-      phone VARCHAR(20) NOT NULL,
-      course VARCHAR(100) NOT NULL,
-      status VARCHAR(20) DEFAULT 'Pending',
-      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-  `;
-  
+// 2. AUTOMATICALLY RUN SCHEMA.SQL ON STARTUP
+const runDatabaseSchema = async () => {
   try {
-    const client = await pool.connect();
+    // Locate the schema.sql file in your server folder
+    const schemaPath = path.resolve(__dirname, 'schema.sql');
     
-    console.log("Checking and initializing database tables...");
-    await client.query(createTablesQuery);
-    console.log("Database tables verified and ready! ");
+    if (!fs.existsSync(schemaPath)) {
+      console.error(` Could not find schema.sql at path: ${schemaPath}`);
+      return;
+    }
+
+    // Read your CREATE TABLE IF NOT EXISTS students script
+    const sqlSchema = fs.readFileSync(schemaPath, 'utf8');
+
+    // Establish the connection channel
+    const client = await pool.connect();
+    console.log("Step 1: Connected to database successfully! Establishing tables...");
+    
+    // Execute your table creation query
+    await client.query(sqlSchema);
+    console.log("Step 2: Database tables verified and ready from schema.sql! 🎉");
+    
+    // Release the temporary connection channel back to the general pool
     client.release();
-  } 
-  catch (err) {
-    console.error("Database structural initialization failed:", err.message);
+  } catch (err) {
+    console.error(" Database setup failed at startup:", err.message);
   }
 };
 
-// Run the initialization immediately when this file is required by server.js
-initDatabaseStructure();
+// Execute the connection and creation sequence immediately when the backend boots up
+runDatabaseSchema();
 
-
-
-// Export the query function globally. This allows other files (like server.js) to securely run SQL statements using this connection pool.
-module.exports = {
-  query: (text, params) => pool.query(text, params),
-};
+module.exports = pool;
