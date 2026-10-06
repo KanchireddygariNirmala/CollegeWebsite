@@ -10,9 +10,10 @@ const pool = new Pool({
   host: process.env.DB_HOST,
   database: process.env.DB_DATABASE,
   password: process.env.DB_PASSWORD,
-  port: process.env.DB_PORT,
-  // Render's managed Postgres requires SSL; local Postgres does not use it.
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  port: process.env.DB_PORT || 5432,
+  ssl: {
+    rejectUnauthorized: false // This line forces SSL and fixes the connection error
+  }
 });
 
 // Here we are connecting the database 
