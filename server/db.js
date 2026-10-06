@@ -26,6 +26,38 @@ pool.connect((err, client, release) => {
   release();
 });
 
+/ Automatic Table Initialization Query
+const initDatabaseStructure = async () => {
+  const createTablesQuery = `
+    CREATE TABLE IF NOT EXISTS students(
+      id SERIAL PRIMARY KEY,
+      name VARCHAR(100) NOT NULL,
+      email VARCHAR(100) NOT NULL UNIQUE,
+      phone VARCHAR(20) NOT NULL,
+      course VARCHAR(100) NOT NULL,
+      status VARCHAR(20) DEFAULT 'Pending',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+  `;
+  
+  try {
+    const client = await pool.connect();
+    
+    console.log("Checking and initializing database tables...");
+    await client.query(createTablesQuery);
+    console.log("Database tables verified and ready! ");
+    client.release();
+  } 
+  catch (err) {
+    console.error("Database structural initialization failed:", err.message);
+  }
+};
+
+// Run the initialization immediately when this file is required by server.js
+initDatabaseStructure();
+
+
+
 // Export the query function globally. This allows other files (like server.js) to securely run SQL statements using this connection pool.
 module.exports = {
   query: (text, params) => pool.query(text, params),
