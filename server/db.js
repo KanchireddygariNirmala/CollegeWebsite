@@ -3,12 +3,9 @@
 // and in Render's dashboard for production) — never hardcode secrets here.
 // Import the Pool class from the 'pg' (node-postgres) library to manage database connections. Using a connection pool is more efficient than opening a new connection for every single query.
 const { Pool } = require('pg');
-const fs = require('fs');
-const path = require('path');
 require('dotenv').config();
 
-// 1. SET UP DATABASE CONNECTION
-// This uses your Render Environment tab values to open the connection securely
+// Connect to the database using your Render dashboard variables
 const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
@@ -16,40 +13,41 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   port: process.env.DB_PORT || 5432,
   ssl: {
-    rejectUnauthorized: false // Required for secure cloud platforms like Render
+    rejectUnauthorized: false // Required for safe cloud hosting environments like Render
   }
 });
 
-// 2. AUTOMATICALLY RUN SCHEMA.SQL ON STARTUP
-const runDatabaseSchema = async () => {
+const forceFreshTableSetup = async () => {
   try {
-    // Locate the schema.sql file in your server folder
-    const schemaPath = path.resolve(__dirname, 'schema.sql');
-    
-    if (!fs.existsSync(schemaPath)) {
-      console.error(` Could not find schema.sql at path: ${schemaPath}`);
-      return;
-    }
-
-    // Read your CREATE TABLE IF NOT EXISTS students script
-    const sqlSchema = fs.readFileSync(schemaPath, 'utf8');
-
-    // Establish the connection channel
     const client = await pool.connect();
-    console.log("Step 1: Connected to database successfully! Establishing tables...");
+    console.log("🔄 Resetting database table layout...");
+
+    // 1. Wipe out any old, broken student table structure safely
+    await client.query(`DROP TABLE IF EXISTS students CASCADE;`);
+
+    // 2. Create the table including all standard client field mapping options
+    await client.query(`
+      CREATE TABLE students (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        age INTEGER NOT NULL,
+        phone VARCHAR(20),
+        phone_number VARCHAR(20),
+        "phoneNumber" VARCHAR(20),
+        course VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
+    `);
     
-    // Execute your table creation query
-    await client.query(sqlSchema);
-    console.log("Step 2: Database tables verified and ready from schema.sql! 🎉");
-    
-    // Release the temporary connection channel back to the general pool
+    console.log("Fresh 'students' table successfully created with all alternative fields! 🎉");
     client.release();
   } catch (err) {
-    console.error(" Database setup failed at startup:", err.message);
+    console.error(" Database table initialization failed:", err.message);
   }
 };
 
-// Execute the connection and creation sequence immediately when the backend boots up
-runDatabaseSchema();
+// Run immediately when the server boots up
+forceFreshTableSetup();
 
 module.exports = pool;
